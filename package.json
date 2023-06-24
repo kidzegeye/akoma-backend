@@ -4,7 +4,7 @@
   "description": "Backend for Akoma",
   "main": "app.js",
   "scripts": {
-    "start": "app.js",
+    "start": "node app.js",
     "test": "test"
   },
   "repository": {

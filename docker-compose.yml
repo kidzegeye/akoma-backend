@@ -1,0 +1,12 @@
+version: "3.6"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .dockerenvrc
+    image:
+      - joinakoma/akoma-backend:v1
+    ports:
+      - "3000:3000"
