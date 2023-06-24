@@ -34,9 +34,9 @@ jobs:
         env:
           IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
         with:
-          host: ${{ secrets.PROD_SERVER_HOST }}
+          host: ${{ secrets.PSERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.PROD_SERVER_KEY }}
+          key: ${{ secrets.SERVER_KEY }}
           script: |
             touch tags
             source tags
