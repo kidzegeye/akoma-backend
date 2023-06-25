@@ -39,6 +39,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_KEY }}
           script: |
+            echo IMAGE_TAG = ${{ steps.vars.outputs.sha_short }} > tag
             export IMAGE_TAG=${{ steps.vars.outputs.sha_short }}
             cd docker-compose
             docker stack rm the-stack
