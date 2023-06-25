@@ -29,7 +29,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: joinakoma/akoma:${{ steps.vars.outputs.sha_short }}
+          tags: joinakoma/akoma-backend:${{ steps.vars.outputs.sha_short }}
       - name: Remote SSH and Deploy
         uses: appleboy/ssh-action@master
         env:
