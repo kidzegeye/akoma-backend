@@ -1,4 +1,5 @@
-./src/tables.db
+*.db
+.db
 # Logs
 logs
 *.log
