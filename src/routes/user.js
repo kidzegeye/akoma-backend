@@ -35,8 +35,8 @@ router.post("/session", async (req, res) => {
   res.status(rows.code).send(rows.response);
 });
 
-router.put("/:id", async (req, res) => {
-  rows = await user_controller.update(id, req.body);
+router.put("/", async (req, res) => {
+  rows = await user_controller.update(req.body);
   res.status(rows.code).send(rows.response);
 });
 

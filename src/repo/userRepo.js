@@ -248,7 +248,50 @@ module.exports = {
       });
     });
   },
-
+  update: async (body) => {
+    return await new Promise((resolve) => {
+      db.serialize(async () => {
+        uid = await get_uid(body.username);
+        if (uid) {
+          validate = await validate_session(uid, body.sessionToken);
+          if (validate.success) {
+            db.run(
+              `UPDATE users SET 
+                firstName=$firstName,
+                lastName=$lastName,
+                email=$email, 
+                phoneNumber=$phoneNumber, 
+                region=$region, 
+                gid=$gid, 
+                businessName=$businessName, 
+                industry=$industry, 
+                address=$address`,
+              {
+                $firstName: body.firstName,
+                $lastName: body.lastName,
+                $email: body.email,
+                $phoneNumber: body.phoneNumber,
+                $region: body.region,
+                $gid: body.gid,
+                $businessName: body.businessName,
+                $industry: body.industry,
+                $address: body.address,
+              },
+              (err) => {
+                err_response = err_callback("user.updated", err);
+                if (err_response) resolve(err_response);
+                else resolve(success_response(200, "Updated user"));
+              }
+            );
+          } else {
+            resolve(validate);
+          }
+        } else {
+          resolve(failure_response(404, "User not found"));
+        }
+      });
+    });
+  },
   delete: async (username, sessionToken) => {
     return await new Promise((resolve) => {
       db.serialize(async () => {
