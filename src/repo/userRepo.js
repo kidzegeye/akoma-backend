@@ -248,4 +248,26 @@ module.exports = {
       });
     });
   },
+
+  delete: async (username, sessionToken) => {
+    return await new Promise((resolve) => {
+      db.serialize(async () => {
+        uid = await get_uid(username);
+        if (uid !== false) {
+          validate = await validate_session(uid, sessionToken);
+          if (validate.success) {
+            db.run(`DELETE FROM users WHERE id=?`, [uid], (err) => {
+              err_response = err_callback("user.delete", err);
+              if (err_response) resolve(err_response);
+              else resolve(success_response(200, "Deleted"));
+            });
+          } else {
+            resolve(validate);
+          }
+        } else {
+          resolve(failure_response(404, "User not found"));
+        }
+      });
+    });
+  },
 };

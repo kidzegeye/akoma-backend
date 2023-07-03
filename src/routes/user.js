@@ -37,12 +37,12 @@ router.post("/session", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   rows = await user_controller.update(id, req.body);
-  res.send(rows);
+  res.status(rows.code).send(rows.response);
 });
 
-router.delete("/:id", async (req, res) => {
-  rows = await user_controller.delete(id);
-  res.send(rows);
+router.delete("/", async (req, res) => {
+  rows = await user_controller.delete(req.body.username, req.body.sessionToken);
+  res.status(rows.code).send(rows.response);
 });
 
 module.exports = router;

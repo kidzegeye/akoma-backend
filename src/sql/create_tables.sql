@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON; 
+
 CREATE TABLE IF NOT EXISTS users (
   id           INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   firstName    TEXT NOT NULL,
@@ -18,5 +20,5 @@ CREATE TABLE session (
   expiresAt    INTEGER NOT NULL,
   refreshToken TEXT NOT NULL,
   userID       INTEGER NOT NULL,
-  FOREIGN KEY (userID) REFERENCES users(id)
+  FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE
 );
