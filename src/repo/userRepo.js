@@ -42,22 +42,28 @@ async function renew_session(uid) {
   const expiration = Date.now() + 86400000; //1 day
   const update_token = crypto.randomBytes(64).toString("base64");
   return await new Promise((resolve) => {
-    db.run(
-      `INSERT INTO session (sessionToken, expiresAt, refreshToken, userID)
-  VALUES (?,?,?,?)`,
-      [session_token, expiration, update_token, uid],
-      (err) => {
-        err_response = err_callback("user.renewSession", err);
+    db.serialize(function () {
+      db.run(`DELETE FROM session WHERE userID=?`, [uid], (err) => {
+        err_response = err_callback("user.renew.delete", err);
         if (err_response) resolve(err_response);
-        resolve(
-          success_response(201, {
-            session_token: session_token,
-            expiration: expiration,
-            update_token: update_token,
-          })
-        );
-      }
-    );
+      });
+      db.run(
+        `INSERT INTO session (sessionToken, expiresAt, refreshToken, userID)
+    VALUES (?,?,?,?)`,
+        [session_token, expiration, update_token, uid],
+        (err) => {
+          err_response = err_callback("user.renewSession", err);
+          if (err_response) resolve(err_response);
+          resolve(
+            success_response(201, {
+              session_token: session_token,
+              expiration: expiration,
+              update_token: update_token,
+            })
+          );
+        }
+      );
+    });
   });
 }
 
@@ -156,7 +162,6 @@ module.exports = {
         (err, rows) => {
           err_response = err_callback("user.validate", err);
           if (err_response) resolve(err_response);
-          console.log(rows);
           if (rows.length != 1) {
             resolve(failure_response(400, "Failed login"));
           } else {
