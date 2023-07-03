@@ -18,7 +18,20 @@ router.post("/", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  rows = await user_controller.validate(req.body);
+  rows = await user_controller.validate(req.body.username, req.body.password);
+  res.status(rows.code).send(rows.response);
+});
+
+router.post("/logout", async (req, res) => {
+  rows = await user_controller.logout(req.body.username, req.body.sessionToken);
+  res.status(rows.code).send(rows.response);
+});
+
+router.post("/session", async (req, res) => {
+  rows = await user_controller.refreshSession(
+    req.body.username,
+    req.body.refreshToken
+  );
   res.status(rows.code).send(rows.response);
 });
 

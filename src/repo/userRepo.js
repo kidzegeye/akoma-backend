@@ -24,27 +24,14 @@ function validate_password(password, hash) {
   return bcrypt.compareSync(password, hash);
 }
 
-function validate_session(uid, session_token) {
-  db.get(
-    "SELECT * FROM session where id=? and session_token=? ORDER BY expiresAt",
-    [uid, session_token],
-    function (err, rows) {
-      if (!err_callback("validate_session", err)) {
-        if (rows[0].expiresAt < Date.now) {
-        }
-      }
-    }
-  );
-}
-
-async function renew_session(uid) {
+async function generate_session(uid) {
   const session_token = crypto.randomBytes(64).toString("base64");
   const expiration = Date.now() + 86400000; //1 day
   const update_token = crypto.randomBytes(64).toString("base64");
   return await new Promise((resolve) => {
     db.serialize(function () {
       db.run(`DELETE FROM session WHERE userID=?`, [uid], (err) => {
-        err_response = err_callback("user.renew.delete", err);
+        err_response = err_callback("user.genSession.delete", err);
         if (err_response) resolve(err_response);
       });
       db.run(
@@ -52,7 +39,7 @@ async function renew_session(uid) {
     VALUES (?,?,?,?)`,
         [session_token, expiration, update_token, uid],
         (err) => {
-          err_response = err_callback("user.renewSession", err);
+          err_response = err_callback("user.genSession", err);
           if (err_response) resolve(err_response);
           resolve(
             success_response(201, {
@@ -64,6 +51,40 @@ async function renew_session(uid) {
         }
       );
     });
+  });
+}
+async function get_uid(username) {
+  return await new Promise((resolve_inner) => {
+    db.get(`SELECT id FROM users WHERE username=?`, [username], (err, id) => {
+      err_response = err_callback("user.validateSession", err);
+      if (err_response) {
+        resolve_inner(false);
+      } else {
+        resolve_inner(id);
+      }
+    });
+  });
+}
+
+async function validate_session(uid, session_token) {
+  return await new Promise((resolve) => {
+    db.get(
+      `SELECT * FROM session WHERE userID=? AND sessionToken=? ORDER BY expiresAt DESC`,
+      [uid, session_token],
+      (err, rows) => {
+        err_response = err_callback("user.validateSession", err);
+        if (err_response) {
+          resolve(err_response);
+        } else {
+          if (!rows) resolve(failure_response(404, "Session not found"));
+          else if (rows[0].expiresAt <= Date.now())
+            resolve(failure_response(400, "Session expired"));
+          else if (rows && rows[0].expiresAt > Date.now())
+            resolve(success_response(200, "Validated"));
+          else resolve(failure_response(500, "Internal server error"));
+        }
+      }
+    );
   });
 }
 
@@ -140,7 +161,7 @@ module.exports = {
                   resolve_inner(err_response);
                 }
                 id = this.lastID;
-                resolve_inner(await renew_session(id));
+                resolve_inner(await generate_session(id));
               }
             );
           });
@@ -154,11 +175,11 @@ module.exports = {
     });
   },
 
-  validate: async (body) => {
+  validate: async (username, password) => {
     return await new Promise((resolve) => {
       db.all(
         "SELECT id, password FROM users WHERE username=?",
-        [body.username],
+        [username],
         (err, rows) => {
           err_response = err_callback("user.validate", err);
           if (err_response) resolve(err_response);
@@ -166,14 +187,60 @@ module.exports = {
             resolve(failure_response(400, "Failed login"));
           } else {
             const hash = rows[0].password;
-            if (validate_password(body.password, hash)) {
-              resolve(renew_session(rows[0].id));
+            if (validate_password(password, hash)) {
+              resolve(generate_session(rows[0].id));
             } else {
               resolve(failure_response(400, "Failed login"));
             }
           }
         }
       );
+    });
+  },
+
+  refreshSession: async (username, refreshToken) => {
+    return await new Promise((resolve) => {
+      db.serialize(async () => {
+        uid = get_uid(username);
+        db.get(
+          `SELECT * FROM session WHERE userID=? AND refreshToken=?`,
+          [uid, refreshToken],
+          (err, rows) => {
+            err_response = err_callback("user.validateSession", err);
+            if (err_response) {
+              resolve(err_response);
+            } else {
+              if (rows) {
+                resolve(success_response(201, generate_session(uid)));
+              } else {
+                resolve(failure_response(404), "Not Found");
+              }
+            }
+          }
+        );
+      });
+    });
+  },
+
+  logout: async (username, sessionToken) => {
+    return await new Promise((resolve) => {
+      db.serialize(async () => {
+        uid = await get_uid(username);
+        if (uid !== false) {
+          validate = await validate_session(uid, sessionToken);
+          if (validate.success) {
+            db.run(`DELETE FROM session WHERE userID=?`, [uid], (err) => {
+              err_response = err_callback("user.logout", err);
+              if (err_response) resolve(err_response);
+              else resolve(success_response(200, "Logged out"));
+            });
+          } else {
+            resolve(validate);
+          }
+        } else {
+          resolve(failure_response(404, "User not found"));
+        }
+      });
     });
   },
 };
