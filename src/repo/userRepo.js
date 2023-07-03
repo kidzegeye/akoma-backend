@@ -27,7 +27,7 @@ function validate_password(password, hash) {
 async function generate_session(uid) {
   const session_token = crypto.randomBytes(64).toString("base64");
   const expiration = Date.now() + 86400000; //1 day
-  const update_token = crypto.randomBytes(64).toString("base64");
+  const refresh_token = crypto.randomBytes(64).toString("base64");
   return await new Promise((resolve) => {
     db.serialize(function () {
       db.run(`DELETE FROM session WHERE userID=?`, [uid], (err) => {
@@ -37,7 +37,7 @@ async function generate_session(uid) {
       db.run(
         `INSERT INTO session (sessionToken, expiresAt, refreshToken, userID)
     VALUES (?,?,?,?)`,
-        [session_token, expiration, update_token, uid],
+        [session_token, expiration, refresh_token, uid],
         (err) => {
           err_response = err_callback("user.genSession", err);
           if (err_response) resolve(err_response);
@@ -45,7 +45,7 @@ async function generate_session(uid) {
             success_response(201, {
               session_token: session_token,
               expiration: expiration,
-              update_token: update_token,
+              refresh_token: refresh_token,
             })
           );
         }
@@ -55,12 +55,12 @@ async function generate_session(uid) {
 }
 async function get_uid(username) {
   return await new Promise((resolve_inner) => {
-    db.get(`SELECT id FROM users WHERE username=?`, [username], (err, id) => {
+    db.get(`SELECT id FROM users WHERE username=?`, [username], (err, row) => {
       err_response = err_callback("user.validateSession", err);
-      if (err_response) {
+      if (err_response || !row) {
         resolve_inner(false);
       } else {
-        resolve_inner(id);
+        resolve_inner(row.id);
       }
     });
   });
@@ -135,40 +135,41 @@ module.exports = {
         async (err, data) => {
           err_response = err_callback("user.create", err);
           if (err_response) resolve(err_response);
-          if (data["COUNT(*)"] > 0) {
+          else if (data["COUNT(*)"] > 0) {
             resolve(failure_response(400, "User already Exists"));
-          }
-          const session = await new Promise((resolve_inner) => {
-            db.run(
-              `INSERT INTO users (firstName, lastName, username, email, password, phoneNumber, region, gid, businessName, industry, address)
-         VALUES ($firstName, $lastName, $username, $email, $password, $phoneNumber, $region, $gid, $business, $industry, $address)`,
-              {
-                $firstName: body.firstName,
-                $lastName: body.lastName,
-                $username: body.username,
-                $email: body.email,
-                $password: hash,
-                $phoneNumber: body.phoneNumber,
-                $region: body.region,
-                $gid: body.gid,
-                $business: body.business,
-                $industry: body.industry,
-                $address: body.address,
-              },
-              async function (err) {
-                err_response = err_callback("users.create ", err);
-                if (err_response) {
-                  resolve_inner(err_response);
-                }
-                id = this.lastID;
-                resolve_inner(await generate_session(id));
-              }
-            );
-          });
-          if (session) {
-            resolve(session);
           } else {
-            resolve(failure_response(500, "Internal server error"));
+            const session = await new Promise((resolve_inner) => {
+              db.run(
+                `INSERT INTO users (firstName, lastName, username, email, password, phoneNumber, region, gid, businessName, industry, address)
+           VALUES ($firstName, $lastName, $username, $email, $password, $phoneNumber, $region, $gid, $business, $industry, $address)`,
+                {
+                  $firstName: body.firstName,
+                  $lastName: body.lastName,
+                  $username: body.username,
+                  $email: body.email,
+                  $password: hash,
+                  $phoneNumber: body.phoneNumber,
+                  $region: body.region,
+                  $gid: body.gid,
+                  $business: body.business,
+                  $industry: body.industry,
+                  $address: body.address,
+                },
+                async function (err) {
+                  err_response = err_callback("users.create ", err);
+                  if (err_response) {
+                    resolve_inner(err_response);
+                  }
+                  id = this.lastID;
+                  resolve_inner(await generate_session(id));
+                }
+              );
+            });
+            if (session) {
+              resolve(session);
+            } else {
+              resolve(failure_response(500, "Internal server error"));
+            }
           }
         }
       );
@@ -201,23 +202,27 @@ module.exports = {
   refreshSession: async (username, refreshToken) => {
     return await new Promise((resolve) => {
       db.serialize(async () => {
-        uid = get_uid(username);
-        db.get(
-          `SELECT * FROM session WHERE userID=? AND refreshToken=?`,
-          [uid, refreshToken],
-          (err, rows) => {
-            err_response = err_callback("user.validateSession", err);
-            if (err_response) {
-              resolve(err_response);
-            } else {
-              if (rows) {
-                resolve(success_response(201, generate_session(uid)));
+        uid = await get_uid(username);
+        if (uid == false) {
+          resolve(failure_response(404, "Not Found"));
+        } else {
+          db.get(
+            `SELECT * FROM session WHERE userID=? AND refreshToken=?`,
+            [uid, refreshToken],
+            async (err, rows) => {
+              err_response = err_callback("user.validateSession", err);
+              if (err_response) {
+                resolve(err_response);
               } else {
-                resolve(failure_response(404), "Not Found");
+                if (rows) {
+                  resolve(await generate_session(uid));
+                } else {
+                  resolve(failure_response(404, "Not Found"));
+                }
               }
             }
-          }
-        );
+          );
+        }
       });
     });
   },
