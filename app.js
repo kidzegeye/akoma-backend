@@ -6,6 +6,7 @@ const userRoute = require("./src/routes/user");
 const db = require("./connect_db.js");
 
 const app = express();
+
 const port = process.env.PORT;
 
 app.use(bodyParser.json());
