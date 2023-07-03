@@ -77,9 +77,9 @@ async function validate_session(uid, session_token) {
           resolve(err_response);
         } else {
           if (!rows) resolve(failure_response(404, "Session not found"));
-          else if (rows[0].expiresAt <= Date.now())
+          else if (rows.expiresAt <= Date.now())
             resolve(failure_response(400, "Session expired"));
-          else if (rows && rows[0].expiresAt > Date.now())
+          else if (rows && rows.expiresAt > Date.now())
             resolve(success_response(200, "Validated"));
           else resolve(failure_response(500, "Internal server error"));
         }
