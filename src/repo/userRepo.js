@@ -25,9 +25,9 @@ function validate_password(password, hash) {
 }
 
 async function generate_session(uid) {
-  const session_token = crypto.randomBytes(64).toString("base64");
+  const sessionToken = crypto.randomBytes(64).toString("base64");
   const expiration = Date.now() + 86400000; //1 day
-  const refresh_token = crypto.randomBytes(64).toString("base64");
+  const refreshToken = crypto.randomBytes(64).toString("base64");
   return await new Promise((resolve) => {
     db.serialize(function () {
       db.run(`DELETE FROM session WHERE userID=?`, [uid], (err) => {
@@ -37,15 +37,15 @@ async function generate_session(uid) {
       db.run(
         `INSERT INTO session (sessionToken, expiresAt, refreshToken, userID)
     VALUES (?,?,?,?)`,
-        [session_token, expiration, refresh_token, uid],
+        [sessionToken, expiration, refreshToken, uid],
         (err) => {
           err_response = err_callback("user.genSession", err);
           if (err_response) resolve(err_response);
           resolve(
             success_response(201, {
-              session_token: session_token,
+              sessionToken: sessionToken,
               expiration: expiration,
-              refresh_token: refresh_token,
+              refreshToken: refreshToken,
             })
           );
         }
@@ -66,11 +66,11 @@ async function get_uid(username) {
   });
 }
 
-async function validate_session(uid, session_token) {
+async function validate_session(uid, sessionToken) {
   return await new Promise((resolve) => {
     db.get(
       `SELECT * FROM session WHERE userID=? AND sessionToken=? ORDER BY expiresAt DESC`,
-      [uid, session_token],
+      [uid, sessionToken],
       (err, rows) => {
         err_response = err_callback("user.validateSession", err);
         if (err_response) {
