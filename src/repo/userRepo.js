@@ -165,7 +165,6 @@ module.exports = {
                 }
               );
             });
-            console.log(session);
             if (session) {
               resolve(session);
             } else {
