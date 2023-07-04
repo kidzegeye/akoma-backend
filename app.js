@@ -5,6 +5,7 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const userRoute = require("./src/routes/user");
+const txnRoute = require("./src/routes/transaction");
 const db = require("./connect_db.js");
 const app = express();
 const port = process.env.PORT;
@@ -19,6 +20,7 @@ app.get("/api/", (req, res) => {
 });
 
 app.use("/api/user", userRoute);
+//app.use("/api/transaction", txnRoute);
 
 const options = {
   definition: {
