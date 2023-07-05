@@ -1,6 +1,6 @@
 const fs = require("fs");
 const sqlite3 = require("sqlite3").verbose();
-const filepath = "./src/tables.db";
+const filepath = "./src/db/tables.db";
 
 function createDbConnection() {
   if (fs.existsSync(filepath)) {
