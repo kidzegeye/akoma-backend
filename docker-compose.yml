@@ -9,6 +9,6 @@ services:
       - /home/azureuser/db/:/usr/src/app/src/db/
     env_file: .dockerenvrc
     image:
-      - joinakoma/akoma-backend:v1
+      - joinakoma/akoma-backend:${IMAGE_TAG}
     ports:
       - "3000:3000"
