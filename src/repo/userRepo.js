@@ -127,7 +127,7 @@ module.exports = {
   create: async (body) => {
     const salt = await bcrypt.genSalt(saltRounds);
     const hash = await bcrypt.hash(body.password, salt);
-
+    console.log(body);
     return await new Promise((resolve) => {
       db.get(
         "SELECT COUNT(*) FROM users WHERE username=?",
