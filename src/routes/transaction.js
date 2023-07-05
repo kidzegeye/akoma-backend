@@ -3,13 +3,13 @@ const { body, validationResult } = require("express-validator");
 const txn_controller = require("../repo/transactionRepo.js");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  rows = await txn_controller.getAll();
+router.get("/:uid", async (req, res) => {
+  rows = await txn_controller.getAll(uid);
   res.status(rows.code).send(rows.response);
 });
 
-router.get("/:id", async (req, res) => {
-  rows = await txn_controller.get();
+router.get("/:uid/:tid", async (req, res) => {
+  rows = await txn_controller.getOne(uid, tid);
   res.status(rows.code).send(rows.response);
 });
 
