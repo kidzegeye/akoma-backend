@@ -127,7 +127,6 @@ module.exports = {
   create: async (body) => {
     const salt = await bcrypt.genSalt(saltRounds);
     const hash = await bcrypt.hash(body.password, salt);
-    console.log(body);
     return await new Promise((resolve) => {
       db.get(
         "SELECT COUNT(*) FROM users WHERE username=?",
@@ -139,7 +138,6 @@ module.exports = {
             resolve(failure_response(400, "User already Exists"));
           } else {
             const session = await new Promise((resolve_inner) => {
-              console.log(body);
               db.run(
                 `INSERT INTO users (firstName, lastName, username, email, password, phoneNumber, region, gid, businessName, industry, address)
            VALUES ($firstName, $lastName, $username, $email, $password, $phoneNumber, $region, $gid, $businessName, $industry, $address)`,
