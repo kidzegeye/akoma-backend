@@ -142,7 +142,6 @@ module.exports = {
               sql = `INSERT INTO transactions (userID, startDate, endDate, transactionType, frequency, transactionName, amount, received)
               VALUES (userID, $startDate, $endDate, $transactionType, $frequency, $transactionName, $amount, $received)`;
             }
-            json;
             db.get(sql, json, (err) => {
               err_response = err_callback("txns.create", err);
               if (err_response) {
@@ -151,6 +150,53 @@ module.exports = {
                 resolve(success_response(201, "Transaction Added"));
               }
             });
+          }
+        }
+      });
+    });
+  },
+  edit: async (sessionToken, body) => {
+    return await new Promise((resolve) => {
+      db.serialize(async () => {
+        uid = await get_uid(body.username);
+        if (!uid) resolve(failure_response(404, "User Not Found"));
+        else {
+          validate = await validate_session(uid, sessionToken);
+          if (!validate.success) resolve(validate);
+          else {
+            db.get(
+              `UPDATE transactions SET
+            userID=$userID,
+            startDate=$startDate,
+            endDate=$endDate,
+            transactionType=$transactionType, 
+            frequency=$frequency, 
+            transactionName=$transactionName, 
+            amount=$amount, 
+            received=$received, 
+            dueDate=$dueDate
+            WHERE id=$tid`,
+              {
+                $userID: uid,
+                $startDate: body.startDate,
+                $endDate: body.endDate,
+                $transactionType: body.transactionType,
+                $frequency: body.frequency,
+                $transactionName: body.transactionName,
+                $amount: body.amount,
+                $received: body.received,
+                $dueDate: body["dueDate"],
+                $tid: body.tid,
+              },
+              (err) => {
+                err_response = err_callback("txns.update", err);
+                if (err_response) {
+                  resolve(err_response);
+                } else {
+                  resolve(success_response(200, "Transaction Updated"));
+                }
+              }
+            );
           }
         }
       });

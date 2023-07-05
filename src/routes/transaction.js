@@ -56,4 +56,21 @@ router.post(
   }
 );
 
+router.put(
+  "/",
+  body("username").trim().notEmpty(),
+  body("tid").trim().notEmpty(),
+  header("authorization").trim().notEmpty(),
+  async (req, res) => {
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      const sessionToken = req.headers.authorization.split(" ")[1];
+      rows = await txn_controller.edit(sessionToken, req.body);
+      res.status(rows.code).send(rows.response);
+    } else {
+      res.send({ errors: result.array() });
+    }
+  }
+);
+
 module.exports = router;
