@@ -154,7 +154,7 @@ module.exports = {
                   $industry: body.industry,
                   $address: body.address,
                 },
-                async function (err) {
+                async function (err, rows) {
                   err_response = err_callback("users.create ", err);
                   if (err_response) {
                     resolve_inner(err_response);
@@ -203,7 +203,7 @@ module.exports = {
       db.serialize(async () => {
         uid = await get_uid(username);
         if (uid == false) {
-          resolve(failure_response(404, "Not Found"));
+          resolve(failure_response(404, "User Not Found"));
         } else {
           db.get(
             `SELECT * FROM session WHERE userID=? AND refreshToken=?`,
@@ -216,7 +216,7 @@ module.exports = {
                 if (rows) {
                   resolve(await generate_session(uid));
                 } else {
-                  resolve(failure_response(404, "Not Found"));
+                  resolve(failure_response(404, "Session Not Found"));
                 }
               }
             }
@@ -247,12 +247,12 @@ module.exports = {
       });
     });
   },
-  update: async (body) => {
+  update: async (body, sessionToken) => {
     return await new Promise((resolve) => {
       db.serialize(async () => {
         uid = await get_uid(body.username);
         if (uid) {
-          validate = await validate_session(uid, body.sessionToken);
+          validate = await validate_session(uid, sessionToken);
           if (validate.success) {
             db.run(
               `UPDATE users SET 

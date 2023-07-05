@@ -24,12 +24,14 @@ CREATE TABLE IF NOT EXISTS  session (
 );
 CREATE TABLE IF NOT EXISTS transactions (
   id              INTEGER PRIMARY KEY,
-  startDate       TEXT NOT NULL,
-  endDate         TEXT NOT NULL,
+  userID          INTEGER NOT NULL,
+  startDate       INTEGER NOT NULL,
+  endDate         INTEGER NOT NULL,
   transactionType TEXT NOT NULL,
   frequency       TEXT NOT NULL,
   transactionName TEXT NOT NULL,
   amount          INTEGER NOT NULL,
   received        INTEGER NOT NULL,
-  dueDate         TEXT NOT NULL
+  dueDate         INTEGER,
+  FOREIGN KEY (userID) REFERENCES users(id)
   );

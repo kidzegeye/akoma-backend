@@ -1,19 +1,59 @@
 const express = require("express");
-const { body, validationResult } = require("express-validator");
+const { body, header, validationResult } = require("express-validator");
 const txn_controller = require("../repo/transactionRepo.js");
 const router = express.Router();
 
-router.get("/:uid", async (req, res) => {
-  rows = await txn_controller.getAll(uid);
-  res.status(rows.code).send(rows.response);
-});
+router.post(
+  "/get",
+  body("username").trim().notEmpty(),
+  header("authorization").trim().notEmpty(),
+  async (req, res) => {
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      const sessionToken = req.headers.authorization.split(" ")[1];
+      rows = await txn_controller.getAll(req.body.username, sessionToken);
+      res.status(rows.code).send(rows.response);
+    } else {
+      res.send({ errors: result.array() });
+    }
+  }
+);
 
-router.get("/:uid/:tid", async (req, res) => {
-  rows = await txn_controller.getOne(uid, tid);
-  res.status(rows.code).send(rows.response);
-});
+router.post(
+  "/get-one",
+  body("username").trim().notEmpty(),
+  header("authorization").trim().notEmpty(),
+  body("tid").trim().notEmpty(),
+  async (req, res) => {
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      const sessionToken = req.headers.authorization.split(" ")[1];
+      rows = await txn_controller.getOne(
+        req.body.username,
+        sessionToken,
+        req.body.tid
+      );
+      res.status(rows.code).send(rows.response);
+    } else {
+      res.send({ errors: result.array() });
+    }
+  }
+);
 
-router.post("/", async (req, res) => {
-  rows = await txn_controller.create();
-  res.status(rows.code).send(rows.response);
-});
+router.post(
+  "/",
+  body("username").trim().notEmpty(),
+  header("authorization").trim().notEmpty(),
+  async (req, res) => {
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      const sessionToken = req.headers.authorization.split(" ")[1];
+      rows = await txn_controller.create(sessionToken, req.body);
+      res.status(rows.code).send(rows.response);
+    } else {
+      res.send({ errors: result.array() });
+    }
+  }
+);
+
+module.exports = router;

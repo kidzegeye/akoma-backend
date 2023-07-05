@@ -15,7 +15,12 @@
  *
  */
 const express = require("express");
-const { body, validationResult, checkSchema } = require("express-validator");
+const {
+  body,
+  header,
+  validationResult,
+  checkSchema,
+} = require("express-validator");
 const user_controller = require("../repo/userRepo.js");
 const router = express.Router();
 const userSchema = {
@@ -186,14 +191,12 @@ router.post(
 router.post(
   "/logout",
   body("username").trim().notEmpty(),
-  body("sessionToken").trim().notEmpty(),
+  header("authorization").trim().notEmpty(),
   async (req, res) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
-      rows = await user_controller.logout(
-        req.body.username,
-        req.body.sessionToken
-      );
+      const sessionToken = req.headers.authorization.split(" ")[1];
+      rows = await user_controller.logout(req.body.username, sessionToken);
       res.status(rows.code).send(rows.response);
     } else {
       res.send({ errors: result.array() });
@@ -218,13 +221,14 @@ router.post(
 router.post(
   "/session",
   body("username").trim().notEmpty(),
-  body("refreshToken").trim().notEmpty(),
+  header("authorization").trim().notEmpty(),
   async (req, res) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
+      const refreshToken = req.headers.authorization.split(" ")[1];
       rows = await user_controller.refreshSession(
         req.body.username,
-        req.body.refreshToken
+        refreshToken
       );
       res.status(rows.code).send(rows.response);
     } else {
@@ -250,11 +254,12 @@ router.post(
 router.put(
   "/",
   checkSchema(userSchema),
-  body("sessionToken").trim().notEmpty(),
+  header("authorization").trim().notEmpty(),
   async (req, res) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
-      rows = await user_controller.update(req.body);
+      const sessionToken = req.headers.authorization.split(" ")[1];
+      rows = await user_controller.update(sessionToken, req.body);
       res.status(rows.code).send(rows.response);
     } else {
       res.send({ errors: result.array() });
@@ -279,14 +284,12 @@ router.put(
 router.delete(
   "/",
   body("username").trim().notEmpty(),
-  body("sessionToken").trim().notEmpty(),
+  header("authorization").trim().notEmpty(),
   async (req, res) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
-      rows = await user_controller.delete(
-        req.body.username,
-        req.body.sessionToken
-      );
+      const sessionToken = req.headers.authorization.split(" ")[1];
+      rows = await user_controller.delete(req.body.username, sessionToken);
       res.status(rows.code).send(rows.response);
     } else {
       res.send({ errors: result.array() });

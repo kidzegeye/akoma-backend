@@ -20,7 +20,7 @@ app.get("/api/", (req, res) => {
 });
 
 app.use("/api/user", userRoute);
-//app.use("/api/transaction", txnRoute);
+app.use("/api/transaction", txnRoute);
 
 const options = {
   definition: {
