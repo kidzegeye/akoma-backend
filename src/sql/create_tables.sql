@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
   address      TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS  session (
-  id           INTEGER PRIMARY KEY, 
+  id           INTEGER PRIMARY KEY AUTOINCREMENT, 
   sessionToken TEXT NOT NULL,
   expiresAt    INTEGER NOT NULL,
   refreshToken TEXT NOT NULL,
@@ -23,15 +23,25 @@ CREATE TABLE IF NOT EXISTS  session (
   FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS transactions (
-  id              INTEGER PRIMARY KEY,
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
   userID          INTEGER NOT NULL,
   startDate       INTEGER NOT NULL,
   endDate         INTEGER NOT NULL,
-  transactionType TEXT NOT NULL,
+  transactionType INTEGER NOT NULL,
   frequency       TEXT NOT NULL,
   transactionName TEXT NOT NULL,
   amount          INTEGER NOT NULL,
   received        INTEGER NOT NULL,
   dueDate         INTEGER,
-  FOREIGN KEY (userID) REFERENCES users(id)
-  );
+  FOREIGN KEY (userID) REFERENCES users(id),
+  FOREIGN KEY (transactionType) REFERENCES transactions(id)
+);
+
+CREATE TABLE IF NOT EXISTS transactionType (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  transactionType TEXT NOT NULL
+);
+
+INSERT INTO transactionType (transactionType) VALUES ("Sales Data");
+INSERT INTO transactionType (transactionType) VALUES ("Expense Data");
+INSERT INTO transactionType (transactionType) VALUES ("Income Statement");

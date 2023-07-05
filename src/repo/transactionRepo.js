@@ -52,27 +52,37 @@ async function validate_session(uid, sessionToken) {
 }
 
 module.exports = {
-  getAll: async (username, sessionToken) => {
+  getAll: async (body, sessionToken) => {
     return await new Promise((resolve) => {
       db.serialize(async () => {
-        uid = await get_uid(username);
+        uid = await get_uid(body.username);
         if (!uid) resolve(failure_response(404, "User Not Found"));
         else {
           validate = await validate_session(uid, sessionToken);
           if (!validate.success) resolve(validate);
           else {
-            db.all(
-              `SELECT * FROM transactions WHERE userID=?`,
-              [uid],
-              (err, rows) => {
-                err_response = err_callback("txns.getAll", err);
-                if (err_response) {
-                  resolve(err_response);
-                } else {
-                  resolve(success_response(200, rows));
-                }
+            sql = `SELECT * FROM transactions JOIN transactionType on transactionType.id=transactions.id WHERE userID=? `;
+            inputs = [uid];
+            if (body.startDate) {
+              sql += ` AND startDate>=?`;
+              inputs.push(body.startDate);
+            }
+            if (body.endDate) {
+              sql += ` AND endDate<=?`;
+              inputs.push(body.endDate);
+            }
+            if (body.transactionType) {
+              sql += ` AND transactions.transactionType=?`;
+              inputs.push(body.transactionType);
+            }
+            db.all(sql, inputs, (err, rows) => {
+              err_response = err_callback("txns.getAll", err);
+              if (err_response) {
+                resolve(err_response);
+              } else {
+                resolve(success_response(200, rows));
               }
-            );
+            });
           }
         }
       });
@@ -88,7 +98,7 @@ module.exports = {
           if (!validate.success) resolve(validate);
           else {
             db.get(
-              `SELECT * FROM transactions WHERE userID=? and id=?`,
+              `SELECT * FROM transactions JOIN transactionType on transactionType.id=transactions.id WHERE userID=? and transactions.id=?`,
               [uid, tid],
               (err, rows) => {
                 err_response = err_callback("txns.getOne", err);
@@ -116,7 +126,7 @@ module.exports = {
             json = {
               $userID: uid,
               $startDate: body.startDate,
-              $endDate: body.startDate,
+              $endDate: body.endDate,
               $transactionType: body.transactionType,
               $frequency: body.frequency,
               $transactionName: body.transactionName,

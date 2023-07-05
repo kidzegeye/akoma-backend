@@ -11,7 +11,7 @@ router.post(
     const result = validationResult(req);
     if (result.isEmpty()) {
       const sessionToken = req.headers.authorization.split(" ")[1];
-      rows = await txn_controller.getAll(req.body.username, sessionToken);
+      rows = await txn_controller.getAll(req.body, sessionToken);
       res.status(rows.code).send(rows.response);
     } else {
       res.send({ errors: result.array() });
