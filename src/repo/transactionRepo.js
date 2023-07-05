@@ -52,5 +52,9 @@ async function validate_session(uid, sessionToken) {
 }
 
 module.exports = {
-  getAll: async (uid) => {},
+  getAll: async (uid) => {
+    return await new Promise((resolve) => {
+      db.serialize();
+    });
+  },
 };

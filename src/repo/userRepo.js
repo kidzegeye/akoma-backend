@@ -106,12 +106,12 @@ module.exports = {
     });
   },
 
-  get: async (id) => {
+  get: async (username) => {
     return await new Promise((resolve) => {
       db.get(
         `SELECT firstName, lastName, username, email, phoneNumber, region, gid, businessName, industry, address FROM users
-       WHERE id=?`,
-        [id],
+       WHERE username=?`,
+        [username],
         (err, data) => {
           err_response = err_callback("users.get", err);
           if (err_response) resolve(err_response);

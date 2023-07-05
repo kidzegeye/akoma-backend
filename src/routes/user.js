@@ -82,12 +82,12 @@ router.get("/", async (req, res) => {
 });
 /**
  * @swagger
- * /{uid}:
- *   get:
+ * /get:
+ *   post:
  *     summary: Get specific user
  *     tags: [User]
  *     requestBody:
- *       required: false
+ *       required: true
  *     responses:
  *       200:
  *         description: One user.
@@ -95,9 +95,14 @@ router.get("/", async (req, res) => {
  *       500:
  *         description: Some server error
  */
-router.get("/:id", async (req, res) => {
-  rows = await user_controller.get(req.params.id);
-  res.status(rows.code).send(rows.response);
+router.post("/get", body("username").trim().notEmpty(), async (req, res) => {
+  const result = validationResult(req);
+  if (result.isEmpty()) {
+    rows = await user_controller.get(req.body.username);
+    res.status(rows.code).send(rows.response);
+  } else {
+    res.send({ errors: result.array() });
+  }
 });
 
 /**
