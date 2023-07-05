@@ -139,6 +139,7 @@ module.exports = {
             resolve(failure_response(400, "User already Exists"));
           } else {
             const session = await new Promise((resolve_inner) => {
+              console.log(body);
               db.run(
                 `INSERT INTO users (firstName, lastName, username, email, password, phoneNumber, region, gid, businessName, industry, address)
            VALUES ($firstName, $lastName, $username, $email, $password, $phoneNumber, $region, $gid, $businessName, $industry, $address)`,

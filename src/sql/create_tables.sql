@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   industry     TEXT NOT NULL,
   address      TEXT NOT NULL
 );
-CREATE TABLE session (
+CREATE TABLE IF NOT EXISTS  session (
   id           INTEGER PRIMARY KEY, 
   sessionToken TEXT NOT NULL,
   expiresAt    INTEGER NOT NULL,
@@ -22,3 +22,14 @@ CREATE TABLE session (
   userID       INTEGER NOT NULL,
   FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS transactions (
+  id              INTEGER PRIMARY KEY,
+  startDate       TEXT NOT NULL,
+  endDate         TEXT NOT NULL,
+  transactionType TEXT NOT NULL,
+  frequency       TEXT NOT NULL,
+  transactionName TEXT NOT NULL,
+  amount          INTEGER NOT NULL,
+  received        INTEGER NOT NULL,
+  dueDate         TEXT NOT NULL
+  );
