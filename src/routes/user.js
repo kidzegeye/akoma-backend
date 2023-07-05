@@ -15,9 +15,52 @@
  *
  */
 const express = require("express");
-const { body, validationResult } = require("express-validator");
+const { body, validationResult, checkSchema } = require("express-validator");
 const user_controller = require("../repo/userRepo.js");
 const router = express.Router();
+const userSchema = {
+  firstName: {
+    trim: true,
+    notEmpty: true,
+  },
+  lastName: {
+    trim: true,
+    notEmpty: true,
+  },
+  email: {
+    trim: true,
+    notEmpty: true,
+    isEmail: true,
+  },
+  username: {
+    trim: true,
+    notEmpty: true,
+  },
+  phoneNumber: {
+    trim: true,
+    notEmpty: true,
+  },
+  region: {
+    trim: true,
+    notEmpty: true,
+  },
+  gid: {
+    trim: true,
+    notEmpty: true,
+  },
+  businessName: {
+    trim: true,
+    notEmpty: true,
+  },
+  industry: {
+    trim: true,
+    notEmpty: true,
+  },
+  address: {
+    trim: true,
+    notEmpty: true,
+  },
+};
 /**
  * @swagger
  * /:
@@ -72,10 +115,21 @@ router.get("/:id", async (req, res) => {
  *       500:
  *         description: Some server error
  */
-router.post("/", async (req, res) => {
-  rows = await user_controller.create(req.body);
-  res.status(rows.code).send(rows.response);
-});
+router.post(
+  "/",
+  checkSchema(userSchema),
+  body("username").trim().notEmpty(),
+  body("password").trim().notEmpty(),
+  async (req, res) => {
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      rows = await user_controller.create(req.body);
+      res.status(rows.code).send(rows.response);
+    } else {
+      res.send({ errors: result.array() });
+    }
+  }
+);
 
 /**
  * @swagger
@@ -188,10 +242,20 @@ router.post(
  *       500:
  *         description: Some server error
  */
-router.put("/", async (req, res) => {
-  rows = await user_controller.update(req.body);
-  res.status(rows.code).send(rows.response);
-});
+router.put(
+  "/",
+  checkSchema(userSchema),
+  body("sessionToken").trim().notEmpty(),
+  async (req, res) => {
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      rows = await user_controller.update(req.body);
+      res.status(rows.code).send(rows.response);
+    } else {
+      res.send({ errors: result.array() });
+    }
+  }
+);
 /**
  * @swagger
  *  /:

@@ -141,7 +141,7 @@ module.exports = {
             const session = await new Promise((resolve_inner) => {
               db.run(
                 `INSERT INTO users (firstName, lastName, username, email, password, phoneNumber, region, gid, businessName, industry, address)
-           VALUES ($firstName, $lastName, $username, $email, $password, $phoneNumber, $region, $gid, $business, $industry, $address)`,
+           VALUES ($firstName, $lastName, $username, $email, $password, $phoneNumber, $region, $gid, $businessName, $industry, $address)`,
                 {
                   $firstName: body.firstName,
                   $lastName: body.lastName,
@@ -151,7 +151,7 @@ module.exports = {
                   $phoneNumber: body.phoneNumber,
                   $region: body.region,
                   $gid: body.gid,
-                  $business: body.business,
+                  $businessName: body.businessName,
                   $industry: body.industry,
                   $address: body.address,
                 },
