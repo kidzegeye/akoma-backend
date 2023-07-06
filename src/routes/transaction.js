@@ -1,3 +1,19 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Transaction
+ *   description: The transaction managing API
+ *
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         startDate:
+ *           type: number
+ *           description: The start date of the transaction (UNIX timestamp)
+ *
+ */
 const express = require("express");
 const {
   body,
@@ -55,6 +71,21 @@ const txnSchema = {
     notEmpty: false,
   },
 };
+
+/**
+ * @swagger
+ * /api/transaction/get:
+ *   post:
+ *     summary: Get all txns from a user
+ *     tags: [Transaction]
+ *     requestBody:
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: List of txns.
+ *       500:
+ *         description: Some server error
+ */
 router.post(
   "/get",
   checkSchema(txnFilterSchema),
@@ -72,6 +103,20 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/transaction/get-one:
+ *   post:
+ *     summary: Get one txns from a user
+ *     tags: [Transaction]
+ *     requestBody:
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: The txn.
+ *       500:
+ *         description: Some server error
+ */
 router.post(
   "/get-one",
   body("username").trim().notEmpty(),
@@ -93,6 +138,20 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/transaction/:
+ *   post:
+ *     summary: Create a txn
+ *     tags: [Transaction]
+ *     requestBody:
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: Confirmation of txn creation
+ *       500:
+ *         description: Some server error
+ */
 router.post(
   "/",
   checkSchema(txnSchema),
@@ -109,7 +168,20 @@ router.post(
     }
   }
 );
-
+/**
+ * @swagger
+ * /api/transaction/:
+ *   put:
+ *     summary: Update a txn
+ *     tags: [Transaction]
+ *     requestBody:
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: Confirmation of txn update.
+ *       500:
+ *         description: Some server error
+ */
 router.put(
   "/",
   checkSchema(txnSchema),

@@ -9,9 +9,9 @@
  *     User:
  *       type: object
  *       properties:
- *         id:
+ *         firstName:
  *           type: string
- *           description: The auto-generated id of the User
+ *           description: The first name of the User
  *
  */
 const express = require("express");
@@ -68,7 +68,7 @@ const userSchema = {
 };
 /**
  * @swagger
- * /:
+ * /api/user/:
  *   get:
  *     summary: Get all users
  *     tags: [User]
@@ -87,7 +87,7 @@ router.get("/", async (req, res) => {
 });
 /**
  * @swagger
- * /get:
+ * /api/user/get:
  *   post:
  *     summary: Get specific user
  *     tags: [User]
@@ -112,7 +112,7 @@ router.post("/get", body("username").trim().notEmpty(), async (req, res) => {
 
 /**
  *  @swagger
- *  /:
+ *  /api/user/:
  *   post:
  *     summary: Create a user
  *     tags: [User]
@@ -143,7 +143,7 @@ router.post(
 
 /**
  * @swagger
- *  /login:
+ *  /api/user/login:
  *   post:
  *     summary: Login to a user's account
  *     tags: [User]
@@ -175,7 +175,7 @@ router.post(
 );
 /**
  * @swagger
- *  /logout:
+ *  /api/user/logout:
  *   get:
  *     summary: Logout of a user's account
  *     tags: [User]
@@ -205,7 +205,7 @@ router.post(
 );
 /**
  * @swagger
- *  /session:
+ *  /api/user/session:
  *   get:
  *     summary: Refresh a user's session
  *     tags: [User]
@@ -238,7 +238,7 @@ router.post(
 );
 /**
  * @swagger
- *  /:
+ *  /api/user/:
  *   put:
  *     summary: Update a user
  *     tags: [User]
@@ -268,7 +268,7 @@ router.put(
 );
 /**
  * @swagger
- *  /:
+ *  /api/user/:
  *   delete:
  *     summary: Delete a user
  *     tags: [User]

@@ -9,19 +9,6 @@ const txnRoute = require("./src/routes/transaction");
 const db = require("./connect_db.js");
 const app = express();
 const port = process.env.PORT;
-
-app.use(bodyParser.json());
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-app.get("/api/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.use("/api/user", userRoute);
-app.use("/api/transaction", txnRoute);
-
 const options = {
   definition: {
     openapi: "3.1.0",
@@ -42,13 +29,16 @@ const options = {
   },
   apis: ["./src/routes/*.js"],
 };
+app.use(bodyParser.json());
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 const specs = swaggerJsdoc(options);
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(specs, { explorer: true })
-);
+app.use("/api", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
+app.use("/api/user", userRoute);
+app.use("/api/transaction", txnRoute);
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
