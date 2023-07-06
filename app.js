@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 const specs = swaggerJsdoc(options);
-app.use("/api", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 app.use("/api/user", userRoute);
 app.use("/api/transaction", txnRoute);
 
