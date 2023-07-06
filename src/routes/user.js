@@ -376,7 +376,7 @@ router.post(
  *            schema:
  *               $ref: '#/components/schemas/Session'
  *       404:
- *         description: Not Found
+ *         description: User/Refresh Not Found
  *       500:
  *         description: Some server error
  */
@@ -418,7 +418,7 @@ router.post(
  *       400:
  *         description: Session expired
  *       404:
- *         description: Not Found
+ *         description: User/Session Not Found
  *       500:
  *         description: Some server error
  */
@@ -463,7 +463,7 @@ router.put(
  *       400:
  *         description: Session expired
  *       404:
- *         description: Not Found
+ *         description: User/Session Not Found
  *       500:
  *         description: Some server error
  */

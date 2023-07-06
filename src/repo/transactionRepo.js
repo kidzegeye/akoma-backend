@@ -61,8 +61,8 @@ module.exports = {
           validate = await validate_session(uid, sessionToken);
           if (!validate.success) resolve(validate);
           else {
-            sql = `SELECT * FROM transactions JOIN transactionType on transactionType.id=transactions.id WHERE userID=? `;
-            inputs = [uid];
+            sql = `SELECT * FROM transactions JOIN transactionType on transactionType.id=transactions.transactionType WHERE username=? `;
+            inputs = [body.username];
             if (body.startDate) {
               sql += ` AND startDate>=?`;
               inputs.push(body.startDate);
@@ -98,8 +98,8 @@ module.exports = {
           if (!validate.success) resolve(validate);
           else {
             db.get(
-              `SELECT * FROM transactions JOIN transactionType on transactionType.id=transactions.id WHERE userID=? and transactions.id=?`,
-              [uid, tid],
+              `SELECT * FROM transactions JOIN transactionType on transactionType.id=transactions.id WHERE username=? and transactions.id=?`,
+              [username, tid],
               (err, rows) => {
                 err_response = err_callback("txns.getOne", err);
                 if (err_response) {
@@ -124,10 +124,10 @@ module.exports = {
           if (!validate.success) resolve(validate);
           else {
             db.get(
-              `INSERT INTO transactions (userID, startDate, endDate, transactionType, frequency, transactionName, amount, received, dueDate)
-            VALUES ($userID, $startDate, $endDate, $transactionType, $frequency, $transactionName, $amount, $received, $dueDate)`,
+              `INSERT INTO transactions (username, startDate, endDate, transactionType, frequency, transactionName, amount, received, dueDate)
+            VALUES ($username, $startDate, $endDate, $transactionType, $frequency, $transactionName, $amount, $received, $dueDate)`,
               {
-                $userID: uid,
+                $username: body.username,
                 $startDate: body.startDate,
                 $endDate: body.endDate,
                 $transactionType: body.transactionType,
@@ -162,7 +162,7 @@ module.exports = {
           else {
             db.get(
               `UPDATE transactions SET
-            userID=$userID,
+            username=$username,
             startDate=$startDate,
             endDate=$endDate,
             transactionType=$transactionType, 
@@ -173,7 +173,7 @@ module.exports = {
             dueDate=$dueDate
             WHERE id=$tid`,
               {
-                $userID: uid,
+                $username: body.username,
                 $startDate: body.startDate,
                 $endDate: body.endDate,
                 $transactionType: body.transactionType,

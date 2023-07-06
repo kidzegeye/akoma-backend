@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   id           INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   firstName    TEXT NOT NULL,
   lastName     TEXT NOT NULL,
-  username     TEXT NOT NULL,
+  username     TEXT UNIQUE NOT NULL,
   email        TEXT NOT NULL,
   password     TEXT NOT NULL,
   phoneNumber  TEXT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS  session (
 );
 CREATE TABLE IF NOT EXISTS transactions (
   id              INTEGER PRIMARY KEY AUTOINCREMENT,
-  userID          INTEGER NOT NULL,
+  username        TEXT NOT NULL,
   startDate       INTEGER NOT NULL,
   endDate         INTEGER NOT NULL,
   transactionType INTEGER NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   amount          INTEGER NOT NULL,
   received        INTEGER NOT NULL,
   dueDate         INTEGER,
-  FOREIGN KEY (userID) REFERENCES users(id),
+  FOREIGN KEY (username) REFERENCES users(username),
   FOREIGN KEY (transactionType) REFERENCES transactions(id)
 );
 

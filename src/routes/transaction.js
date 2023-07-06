@@ -5,15 +5,64 @@
  *   description: The transaction managing API
  *
  * components:
- *   schemas:
+ *  securitySchemes:
+ *     sessionToken:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *  schemas:
  *     Transaction:
  *       type: object
+ *       required:
+ *        - username
+ *        - startDate
+ *        - endDate
+ *        - transactionType
+ *        - frequency
+ *        - transactionName
+ *        - amount
+ *        - received
  *       properties:
+ *         username:
+ *           type: string
+ *           description: The user's username
  *         startDate:
  *           type: number
  *           description: The start date of the transaction (UNIX timestamp)
- *
+ *         endDate:
+ *           type: number
+ *           description: The end date of the transaction (UNIX timestamp)
+ *         transactionType:
+ *           type: number
+ *           description: The transaction type of the transaction
+ *         frequency:
+ *           type: string
+ *           description: The frequency of the transaction
+ *         transactionName:
+ *           type: string
+ *           description: The name of the transaction
+ *           enum: [1, 2, 3]
+ *         amount:
+ *           type: number
+ *           description: The monetary amount of the transaction. Formatted without decimal point ($1.00 => 100)
+ *         received:
+ *           type: boolean
+ *           description: Whether the transaction has been received
+ *         dueDate:
+ *           type: number
+ *           description: The due date of the transaction (UNIX timestamp)
+ *     TransactionTID:
+ *       allOf:
+ *        - $ref: '#/components/schemas/Transaction'
+ *        - type: object
+ *          required:
+ *           - tid
+ *          properties:
+ *           tid:
+ *              type: number
+ *              description: The transaction's id
  */
+
 const express = require("express");
 const {
   body,
@@ -23,20 +72,6 @@ const {
 } = require("express-validator");
 const txn_controller = require("../repo/transactionRepo.js");
 const router = express.Router();
-const txnFilterSchema = {
-  startDate: {
-    trim: true,
-    notEmpty: true,
-  },
-  endDate: {
-    trim: true,
-    notEmpty: true,
-  },
-  transactionType: {
-    trim: true,
-    notEmpty: true,
-  },
-};
 const txnSchema = {
   startDate: {
     trim: true,
@@ -78,17 +113,48 @@ const txnSchema = {
  *   post:
  *     summary: Get all txns from a user
  *     tags: [Transaction]
+ *     security:
+ *      - sessionToken: []
  *     requestBody:
  *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username
+ *               startDate:
+ *                 type: number
+ *                 description: Transaction's start date (UNIX timestamp)
+ *               endDate:
+ *                 type: number
+ *                 description: Transaction's end date (UNIX timestamp)
+ *               TransactionType:
+ *                 type: number
+ *                 description: Transaction's type
+ *                 enum: [1, 2, 3]
+ *             required:
+ *               - username
  *     responses:
  *       200:
- *         description: List of txns.
+ *         description: List of txns
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *               $ref: '#/components/schemas/Transaction'
+ *       400:
+ *         description: Session Expired
+ *       404:
+ *         description: User/Session Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 router.post(
   "/get",
-  checkSchema(txnFilterSchema),
   body("username").trim().notEmpty(),
   header("authorization").trim().notEmpty(),
   async (req, res) => {
@@ -109,13 +175,37 @@ router.post(
  *   post:
  *     summary: Get one txns from a user
  *     tags: [Transaction]
+ *     security:
+ *      - sessionToken: []
  *     requestBody:
  *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username
+ *               tid:
+ *                 type: string
+ *                 description: Transaction's id
+ *             required:
+ *               - username
+ *               - tid
  *     responses:
  *       200:
  *         description: The txn.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Transaction'
+ *       400:
+ *         description: Session Expired
+ *       404:
+ *         description: User/Session Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 router.post(
   "/get-one",
@@ -144,11 +234,21 @@ router.post(
  *   post:
  *     summary: Create a txn
  *     tags: [Transaction]
+ *     security:
+ *      - sessionToken: []
  *     requestBody:
  *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Transaction'
  *     responses:
- *       200:
+ *       201:
  *         description: Confirmation of txn creation
+ *       400:
+ *         description: Session Expired
+ *       404:
+ *         description: User/Session Not Found
  *       500:
  *         description: Some server error
  */
@@ -174,11 +274,21 @@ router.post(
  *   put:
  *     summary: Update a txn
  *     tags: [Transaction]
+ *     security:
+ *      - sessionToken: []
  *     requestBody:
  *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TransactionTID'
  *     responses:
- *       200:
- *         description: Confirmation of txn update.
+ *       201:
+ *         description: Confirmation of txn update
+ *       400:
+ *         description: Session Expired
+ *       404:
+ *         description: User/Session Not Found
  *       500:
  *         description: Some server error
  */
