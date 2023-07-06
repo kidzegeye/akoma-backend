@@ -123,33 +123,29 @@ module.exports = {
           validate = await validate_session(uid, sessionToken);
           if (!validate.success) resolve(validate);
           else {
-            json = {
-              $userID: uid,
-              $startDate: body.startDate,
-              $endDate: body.endDate,
-              $transactionType: body.transactionType,
-              $frequency: body.frequency,
-              $transactionName: body.transactionName,
-              $amount: body.amount,
-              $received: body.received,
-            };
-            let sql = ``;
-            if (body.dueDate) {
-              json["$dueDate"] = body.dueDate;
-              sql = `INSERT INTO transactions (userID, startDate, endDate, transactionType, frequency, transactionName, amount, received, dueDate)
-              VALUES ($userID, $startDate, $endDate, $transactionType, $frequency, $transactionName, $amount, $received, $dueDate)`;
-            } else {
-              sql = `INSERT INTO transactions (userID, startDate, endDate, transactionType, frequency, transactionName, amount, received)
-              VALUES (userID, $startDate, $endDate, $transactionType, $frequency, $transactionName, $amount, $received)`;
-            }
-            db.get(sql, json, (err) => {
-              err_response = err_callback("txns.create", err);
-              if (err_response) {
-                resolve(err_response);
-              } else {
-                resolve(success_response(201, "Transaction Added"));
+            db.get(
+              `INSERT INTO transactions (userID, startDate, endDate, transactionType, frequency, transactionName, amount, received, dueDate)
+            VALUES ($userID, $startDate, $endDate, $transactionType, $frequency, $transactionName, $amount, $received, $dueDate)`,
+              {
+                $userID: uid,
+                $startDate: body.startDate,
+                $endDate: body.endDate,
+                $transactionType: body.transactionType,
+                $frequency: body.frequency,
+                $transactionName: body.transactionName,
+                $amount: body.amount,
+                $received: body.received,
+                $dueDate: body["dueDate"],
+              },
+              (err) => {
+                err_response = err_callback("txns.create", err);
+                if (err_response) {
+                  resolve(err_response);
+                } else {
+                  resolve(success_response(201, "Transaction Added"));
+                }
               }
-            });
+            );
           }
         }
       });

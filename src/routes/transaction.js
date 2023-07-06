@@ -1,10 +1,63 @@
 const express = require("express");
-const { body, header, validationResult } = require("express-validator");
+const {
+  body,
+  header,
+  validationResult,
+  checkSchema,
+} = require("express-validator");
 const txn_controller = require("../repo/transactionRepo.js");
 const router = express.Router();
-
+const txnFilterSchema = {
+  startDate: {
+    trim: true,
+    notEmpty: true,
+  },
+  endDate: {
+    trim: true,
+    notEmpty: true,
+  },
+  transactionType: {
+    trim: true,
+    notEmpty: true,
+  },
+};
+const txnSchema = {
+  startDate: {
+    trim: true,
+    notEmpty: true,
+  },
+  endDate: {
+    trim: true,
+    notEmpty: true,
+  },
+  transactionType: {
+    trim: true,
+    notEmpty: true,
+  },
+  frequency: {
+    trim: true,
+    notEmpty: true,
+  },
+  transactionName: {
+    trim: true,
+    notEmpty: true,
+  },
+  amount: {
+    trim: true,
+    notEmpty: true,
+  },
+  received: {
+    trim: true,
+    notEmpty: true,
+  },
+  dueDate: {
+    trim: true,
+    notEmpty: false,
+  },
+};
 router.post(
   "/get",
+  checkSchema(txnFilterSchema),
   body("username").trim().notEmpty(),
   header("authorization").trim().notEmpty(),
   async (req, res) => {
@@ -42,6 +95,7 @@ router.post(
 
 router.post(
   "/",
+  checkSchema(txnSchema),
   body("username").trim().notEmpty(),
   header("authorization").trim().notEmpty(),
   async (req, res) => {
@@ -58,6 +112,7 @@ router.post(
 
 router.put(
   "/",
+  checkSchema(txnSchema),
   body("username").trim().notEmpty(),
   body("tid").trim().notEmpty(),
   header("authorization").trim().notEmpty(),
