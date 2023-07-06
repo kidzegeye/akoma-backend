@@ -6,7 +6,7 @@
  *
  * components:
  *   schemas:
- *     User:
+ *     Transaction:
  *       type: object
  *       properties:
  *         startDate:

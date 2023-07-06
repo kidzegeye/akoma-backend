@@ -5,13 +5,90 @@
  *   description: The user managing API
  *
  * components:
+ *   securitySchemes:
+ *     sessionToken:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *     refreshToken:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     User:
  *       type: object
+ *       required:
+ *        - firstName
+ *        - lastName
+ *        - email
+ *        - phoneNumber
+ *        - region
+ *        - gid
+ *        - businessName
+ *        - industry
+ *        - address
  *       properties:
  *         firstName:
  *           type: string
  *           description: The first name of the User
+ *         lastName:
+ *           type: string
+ *           description: The last name of the User
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: The email of the User
+ *         phoneNumber:
+ *           type: string
+ *           description: The phone number of the User
+ *         region:
+ *           type: string
+ *           description: The region of the User
+ *         gid:
+ *           type: string
+ *           description: The Ghana ID of the User
+ *         businessName:
+ *           type: string
+ *           description: The name of the User's business
+ *         industry:
+ *           type: string
+ *           description: The industry of the User
+ *         address:
+ *           type: string
+ *           description: The business' address
+ *     UserUname:
+ *      allOf:
+ *       - $ref: '#/components/schemas/User'
+ *       - type: object
+ *         required:
+ *          - username
+ *         properties:
+ *          username:
+ *             type: string
+ *             description: The username of User
+ *     UserUnamePW:
+ *       allOf:
+ *        - $ref: '#/components/schemas/UserUname'
+ *        - type: object
+ *          required:
+ *           - password
+ *          properties:
+ *            password:
+ *              type: string
+ *              format: password
+ *              description: The password of the User
+ *     Session:
+ *       type: object
+ *       properties:
+ *         sessionToken:
+ *           type: string
+ *           description: Token used for authenticating a User session
+ *         expiration:
+ *           type: number
+ *           description: DateTime (in UNIX milliseconds) of when the session token expires
+ *         refreshToken:
+ *           type: string
+ *           description: Token used for generating a new session token
  *
  */
 const express = require("express");
@@ -71,14 +148,19 @@ const userSchema = {
  * /api/user/:
  *   get:
  *     summary: Get all users
+ *     description: Get all users
  *     tags: [User]
- *     requestBody:
- *       required: false
  *     responses:
  *       200:
  *         description: List of users.
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *               $ref: '#/components/schemas/UserUname'
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 
 router.get("/", async (req, res) => {
@@ -90,15 +172,31 @@ router.get("/", async (req, res) => {
  * /api/user/get:
  *   post:
  *     summary: Get specific user
+ *     description: Get specific user
  *     tags: [User]
  *     requestBody:
  *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username
+ *             required:
+ *               - username
  *     responses:
  *       200:
- *         description: One user.
- 
+ *         description: One user
+ *         content:
+ *          application/json:
+ *            schema:
+ *               $ref: '#/components/schemas/UserUname'
+ *       404:
+ *         description: User Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 router.post("/get", body("username").trim().notEmpty(), async (req, res) => {
   const result = validationResult(req);
@@ -115,15 +213,25 @@ router.post("/get", body("username").trim().notEmpty(), async (req, res) => {
  *  /api/user/:
  *   post:
  *     summary: Create a user
+ *     description: Create a user
  *     tags: [User]
  *     requestBody:
  *       required: true
+ *       content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserUnamePW'
  *     responses:
  *       201:
  *         description: Created user's session data.
- 
+ *         content:
+ *          application/json:
+ *            schema:
+ *               $ref: '#/components/schemas/Session'
+ *       400:
+ *         description: User Already Exists
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 router.post(
   "/",
@@ -142,19 +250,40 @@ router.post(
 );
 
 /**
- * @swagger
+ *  @swagger
  *  /api/user/login:
  *   post:
  *     summary: Login to a user's account
+ *     description: Login to a user's account
  *     tags: [User]
  *     requestBody:
  *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: User's password
+ *             required:
+ *               - username
+ *               - password
  *     responses:
  *       201:
- *         description: The user's session data
- 
+ *         description: Created user's session data.
+ *         content:
+ *          application/json:
+ *            schema:
+ *               $ref: '#/components/schemas/Session'
+ *       400:
+ *         description: Login Failed
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 router.post(
   "/login",
@@ -174,19 +303,35 @@ router.post(
   }
 );
 /**
- * @swagger
+ *  @swagger
  *  /api/user/logout:
- *   get:
+ *   post:
  *     summary: Logout of a user's account
+ *     description: Logout of a user's account
  *     tags: [User]
+ *     security:
+ *      - sessionToken: []
  *     requestBody:
  *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username
+ *             required:
+ *               - username
  *     responses:
  *       200:
- *         description: Logout confirmation.
- 
+ *         description: Logged Out Confirmation.
+ *       400:
+ *         description: Session Expired
+ *       404:
+ *         description: User/Session Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 router.post(
   "/logout",
@@ -206,15 +351,32 @@ router.post(
 /**
  * @swagger
  *  /api/user/session:
- *   get:
+ *   post:
  *     summary: Refresh a user's session
  *     tags: [User]
+ *     security:
+ *      - refreshToken: []
  *     requestBody:
- *       required: false
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username
+ *             required:
+ *               - username
  *     responses:
  *       201:
- *         description: The user's session data.
- 
+ *         description: Created user's session data.
+ *         content:
+ *          application/json:
+ *            schema:
+ *               $ref: '#/components/schemas/Session'
+ *       404:
+ *         description: Not Found
  *       500:
  *         description: Some server error
  */
@@ -242,12 +404,21 @@ router.post(
  *   put:
  *     summary: Update a user
  *     tags: [User]
+ *     security:
+ *      - sessionToken: []
  *     requestBody:
  *       required: true
+ *       content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *     responses:
  *       200:
  *         description: Update confirmation.
- 
+ *       400:
+ *         description: Session expired
+ *       404:
+ *         description: Not Found
  *       500:
  *         description: Some server error
  */
@@ -272,12 +443,27 @@ router.put(
  *   delete:
  *     summary: Delete a user
  *     tags: [User]
+ *     security:
+ *      - sessionToken: []
  *     requestBody:
  *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's username
+ *             required:
+ *               - username
  *     responses:
  *       200:
  *         description: Deletion confirmation.
- 
+ *       400:
+ *         description: Session expired
+ *       404:
+ *         description: Not Found
  *       500:
  *         description: Some server error
  */
