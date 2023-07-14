@@ -5,7 +5,7 @@ function success_response(code, data) {
 }
 
 function failure_response(code, err) {
-  return { success: false, code: code, response: err };
+  return { success: false, code: code, response: { error: err } };
 }
 
 function err_callback(loc, err) {
