@@ -15,7 +15,7 @@ function failure_response(code, err) {
 function err_callback(loc, err) {
   if (err) {
     console.log(`${loc} error:\n ${err}`);
-    return failure_response(500, "Internal server error");
+    return failure_response(500, "Internal Server Error");
   }
   return false;
 }
@@ -78,9 +78,9 @@ async function validate_session(uid, sessionToken) {
         } else {
           if (!rows) resolve(failure_response(404, "Session not found"));
           else if (rows.expiresAt <= Date.now())
-            resolve(failure_response(400, "Session expired"));
+            resolve(failure_response(400, "Session Expired"));
           else if (rows && rows.expiresAt > Date.now())
-            resolve(success_response(200, "Validated"));
+            resolve(success_response(200, { response: "Validated" }));
           else resolve(failure_response(500, "Internal server error"));
         }
       }
@@ -115,7 +115,7 @@ module.exports = {
         (err, data) => {
           err_response = err_callback("users.get", err);
           if (err_response) resolve(err_response);
-          if (!data) resolve(failure_response(404, "User not found"));
+          if (!data) resolve(failure_response(404, "User Not Found"));
           resolve(success_response(200, data));
         }
       );
@@ -135,7 +135,7 @@ module.exports = {
           err_response = err_callback("user.create", err);
           if (err_response) resolve(err_response);
           else if (data["COUNT(*)"] > 0) {
-            resolve(failure_response(400, "User already Exists"));
+            resolve(failure_response(400, "User Already Exists"));
           } else {
             const session = await new Promise((resolve_inner) => {
               db.run(
@@ -167,7 +167,7 @@ module.exports = {
             if (session) {
               resolve(session);
             } else {
-              resolve(failure_response(500, "Internal server error"));
+              resolve(failure_response(500, "Internal Server Error"));
             }
           }
         }
@@ -184,13 +184,13 @@ module.exports = {
           err_response = err_callback("user.validate", err);
           if (err_response) resolve(err_response);
           if (rows.length != 1) {
-            resolve(failure_response(400, "Failed login"));
+            resolve(failure_response(400, "Login Failed"));
           } else {
             const hash = rows[0].password;
             if (validate_password(password, hash)) {
               resolve(generate_session(rows[0].id));
             } else {
-              resolve(failure_response(400, "Failed login"));
+              resolve(failure_response(400, "Login Failed"));
             }
           }
         }
@@ -236,13 +236,13 @@ module.exports = {
             db.run(`DELETE FROM session WHERE userID=?`, [uid], (err) => {
               err_response = err_callback("user.logout", err);
               if (err_response) resolve(err_response);
-              else resolve(success_response(200, "Logged out"));
+              else resolve(success_response(200, { response: "Logged Out" }));
             });
           } else {
             resolve(validate);
           }
         } else {
-          resolve(failure_response(404, "User not found"));
+          resolve(failure_response(404, "User Not Found"));
         }
       });
     });
@@ -279,14 +279,15 @@ module.exports = {
               (err) => {
                 err_response = err_callback("user.updated", err);
                 if (err_response) resolve(err_response);
-                else resolve(success_response(200, "Updated user"));
+                else
+                  resolve(success_response(200, { response: "Updated User" }));
               }
             );
           } else {
             resolve(validate);
           }
         } else {
-          resolve(failure_response(404, "User not found"));
+          resolve(failure_response(404, "User Not Found"));
         }
       });
     });
@@ -301,13 +302,13 @@ module.exports = {
             db.run(`DELETE FROM users WHERE id=?`, [uid], (err) => {
               err_response = err_callback("user.delete", err);
               if (err_response) resolve(err_response);
-              else resolve(success_response(200, "Deleted"));
+              else resolve(success_response(200, { response: "Deleted" }));
             });
           } else {
             resolve(validate);
           }
         } else {
-          resolve(failure_response(404, "User not found"));
+          resolve(failure_response(404, "User Not Found"));
         }
       });
     });

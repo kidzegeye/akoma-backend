@@ -148,10 +148,34 @@ const txnSchema = {
  *               $ref: '#/components/schemas/Transaction'
  *       400:
  *         description: Session Expired
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Session Expired
  *       404:
  *         description: User/Session Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Not Found
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.post(
   "/get",
@@ -202,10 +226,34 @@ router.post(
  *               $ref: '#/components/schemas/Transaction'
  *       400:
  *         description: Session Expired
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Session Expired
  *       404:
  *         description: User/Session Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Not Found
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.post(
   "/get-one",
@@ -245,12 +293,44 @@ router.post(
  *     responses:
  *       201:
  *         description: Confirmation of txn creation
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Transaction Added
  *       400:
  *         description: Session Expired
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Session Expired
  *       404:
  *         description: User/Session Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.post(
   "/",
@@ -285,12 +365,44 @@ router.post(
  *     responses:
  *       201:
  *         description: Confirmation of txn update
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Transaction Updated
  *       400:
  *         description: Session Expired
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Session Expired
  *       404:
  *         description: User/Session Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.put(
   "/",

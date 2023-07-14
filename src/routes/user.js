@@ -161,6 +161,14 @@ const userSchema = {
  *               $ref: '#/components/schemas/UserUname'
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error.
  */
 
 router.get("/", async (req, res) => {
@@ -195,8 +203,24 @@ router.get("/", async (req, res) => {
  *               $ref: '#/components/schemas/UserUname'
  *       404:
  *         description: User Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: User Not Found
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.post("/get", body("username").trim().notEmpty(), async (req, res) => {
   const result = validationResult(req);
@@ -230,8 +254,24 @@ router.post("/get", body("username").trim().notEmpty(), async (req, res) => {
  *               $ref: '#/components/schemas/Session'
  *       400:
  *         description: User Already Exists
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: User Already Exists
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.post(
   "/",
@@ -282,8 +322,24 @@ router.post(
  *               $ref: '#/components/schemas/Session'
  *       400:
  *         description: Login Failed
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Login Failed
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.post(
   "/login",
@@ -326,12 +382,44 @@ router.post(
  *     responses:
  *       200:
  *         description: Logged Out Confirmation.
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Logged Out
  *       400:
  *         description: Session Expired
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Session Expired
  *       404:
  *         description: User/Session Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Not Found
  *       500:
  *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.post(
   "/logout",
@@ -377,8 +465,24 @@ router.post(
  *               $ref: '#/components/schemas/Session'
  *       404:
  *         description: User/Refresh Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.post(
   "/session",
@@ -415,12 +519,44 @@ router.post(
  *     responses:
  *       200:
  *         description: Update confirmation.
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Updated User
  *       400:
- *         description: Session expired
+ *         description: Session Expired
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Session Expired
  *       404:
  *         description: User/Session Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.put(
   "/",
@@ -460,12 +596,44 @@ router.put(
  *     responses:
  *       200:
  *         description: Deletion confirmation.
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Deleted User
  *       400:
- *         description: Session expired
+ *         description: Session Expired
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Session Expired
  *       404:
  *         description: User/Session Not Found
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  error:
+ *                   type: string
+ *                   description: Internal Server Error
  */
 router.delete(
   "/",

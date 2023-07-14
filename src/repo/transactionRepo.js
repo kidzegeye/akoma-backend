@@ -43,7 +43,7 @@ async function validate_session(uid, sessionToken) {
           else if (rows.expiresAt <= Date.now())
             resolve(failure_response(400, "Session expired"));
           else if (rows && rows.expiresAt > Date.now())
-            resolve(success_response(200, "Validated"));
+            resolve(success_response(200, { response: "Validated" }));
           else resolve(failure_response(500, "Internal server error"));
         }
       }
@@ -142,7 +142,9 @@ module.exports = {
                 if (err_response) {
                   resolve(err_response);
                 } else {
-                  resolve(success_response(201, "Transaction Added"));
+                  resolve(
+                    success_response(201, { response: "Transaction Added" })
+                  );
                 }
               }
             );
@@ -189,7 +191,9 @@ module.exports = {
                 if (err_response) {
                   resolve(err_response);
                 } else {
-                  resolve(success_response(200, "Transaction Updated"));
+                  resolve(
+                    success_response(200, { response: "Transaction Updated" })
+                  );
                 }
               }
             );
