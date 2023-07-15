@@ -515,7 +515,7 @@ router.post(
  *       content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/UserUname'
  *     responses:
  *       200:
  *         description: Update confirmation.
