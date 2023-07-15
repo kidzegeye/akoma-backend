@@ -131,7 +131,7 @@ const txnSchema = {
  *               endDate:
  *                 type: number
  *                 description: Transaction's end date (UNIX timestamp)
- *               TransactionType:
+ *               transactionType:
  *                 type: number
  *                 description: Transaction's type
  *                 enum: [1, 2, 3]
