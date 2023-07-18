@@ -92,7 +92,7 @@ module.exports = {
   getAll: async () => {
     return await new Promise((resolve) => {
       db.all(
-        "SELECT firstName, lastName, username, email, phoneNumber, region, gid, businessName, industry, address FROM users",
+        "SELECT firstName, lastName, username, email, phoneNumber, region, ghanaCardNum, businessName, industry, address FROM users",
         (err, data) => {
           err_response = err_callback("users.getAll", err);
           if (!err_response) {
@@ -109,7 +109,7 @@ module.exports = {
   get: async (username) => {
     return await new Promise((resolve) => {
       db.get(
-        `SELECT firstName, lastName, username, email, phoneNumber, region, gid, businessName, industry, address FROM users
+        `SELECT firstName, lastName, username, email, phoneNumber, region, ghanaCardNum, businessName, industry, address FROM users
        WHERE username=?`,
         [username],
         (err, data) => {
@@ -139,8 +139,8 @@ module.exports = {
           } else {
             const session = await new Promise((resolve_inner) => {
               db.run(
-                `INSERT INTO users (firstName, lastName, username, email, password, phoneNumber, region, gid, businessName, industry, address)
-           VALUES ($firstName, $lastName, $username, $email, $password, $phoneNumber, $region, $gid, $businessName, $industry, $address)`,
+                `INSERT INTO users (firstName, lastName, username, email, password, phoneNumber, region, ghanaCardNum, businessName, industry, address)
+           VALUES ($firstName, $lastName, $username, $email, $password, $phoneNumber, $region, $ghanaCardNum, $businessName, $industry, $address)`,
                 {
                   $firstName: body.firstName,
                   $lastName: body.lastName,
@@ -149,7 +149,7 @@ module.exports = {
                   $password: hash,
                   $phoneNumber: body.phoneNumber,
                   $region: body.region,
-                  $gid: body.gid,
+                  $ghanaCardNum: body.ghanaCardNum,
                   $businessName: body.businessName,
                   $industry: body.industry,
                   $address: body.address,
@@ -261,7 +261,7 @@ module.exports = {
                 email=$email, 
                 phoneNumber=$phoneNumber, 
                 region=$region, 
-                gid=$gid, 
+                ghanaCardNum=$ghanaCardNum, 
                 businessName=$businessName, 
                 industry=$industry, 
                 address=$address`,
@@ -271,7 +271,7 @@ module.exports = {
                 $email: body.email,
                 $phoneNumber: body.phoneNumber,
                 $region: body.region,
-                $gid: body.gid,
+                $ghanaCardNum: body.ghanaCardNum,
                 $businessName: body.businessName,
                 $industry: body.industry,
                 $address: body.address,

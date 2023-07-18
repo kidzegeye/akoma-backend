@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   password     TEXT NOT NULL,
   phoneNumber  TEXT NOT NULL,
   region       TEXT NOT NULL,
-  gid          TEXT NOT NULL,
+  ghanaCardNum TEXT NOT NULL,
   businessName TEXT NOT NULL,
   industry     TEXT NOT NULL,
   address      TEXT NOT NULL

@@ -23,7 +23,7 @@
  *        - email
  *        - phoneNumber
  *        - region
- *        - gid
+ *        - ghanaCardNum
  *        - businessName
  *        - industry
  *        - address
@@ -44,7 +44,7 @@
  *         region:
  *           type: string
  *           description: The region of the User
- *         gid:
+ *         ghanaCardNum:
  *           type: string
  *           description: The Ghana ID of the User
  *         businessName:
@@ -126,7 +126,7 @@ const userSchema = {
     trim: true,
     notEmpty: true,
   },
-  gid: {
+  ghanaCardNum: {
     trim: true,
     notEmpty: true,
   },
