@@ -61,7 +61,7 @@ module.exports = {
           validate = await validate_session(uid, sessionToken);
           if (!validate.success) resolve(validate);
           else {
-            sql = `SELECT * FROM transactions JOIN transactionType on transactionType.id=transactions.transactionType WHERE username=? `;
+            sql = `SELECT * FROM transactions WHERE username=? `;
             inputs = [body.username];
             if (body.startDate) {
               sql += ` AND startDate>=?`;
@@ -98,7 +98,7 @@ module.exports = {
           if (!validate.success) resolve(validate);
           else {
             db.get(
-              `SELECT * FROM transactions JOIN transactionType on transactionType.id=transactions.id WHERE username=? and transactions.id=?`,
+              `SELECT * FROM transactions WHERE username=? and transactions.id=?`,
               [username, tid],
               (err, rows) => {
                 err_response = err_callback("txns.getOne", err);

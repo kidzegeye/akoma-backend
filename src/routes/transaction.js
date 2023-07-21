@@ -337,6 +337,11 @@ router.post(
   checkSchema(txnSchema),
   body("username").trim().notEmpty(),
   header("authorization").trim().notEmpty(),
+  body("amount").isCurrency(
+    (require_symbol = false),
+    (decimal_separator = "."),
+    (require_decimal = true)
+  ),
   async (req, res) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
