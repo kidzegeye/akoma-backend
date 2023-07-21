@@ -43,8 +43,8 @@
  *           description: The name of the transaction
  *           enum: [1, 2, 3]
  *         amount:
- *           type: number
- *           description: The monetary amount of the transaction. Formatted without decimal point ($1.00 => 100)
+ *           type: text
+ *           description: The monetary amount of the transaction.
  *         received:
  *           type: boolean
  *           description: Whether the transaction has been received

@@ -30,11 +30,11 @@ CREATE TABLE IF NOT EXISTS transactions (
   transactionType INTEGER NOT NULL,
   frequency       TEXT NOT NULL,
   transactionName TEXT NOT NULL,
-  amount          INTEGER NOT NULL,
+  amount          TEXT NOT NULL,
   received        INTEGER NOT NULL,
   dueDate         INTEGER,
   FOREIGN KEY (username) REFERENCES users(username),
-  FOREIGN KEY (transactionType) REFERENCES transactions(id)
+  FOREIGN KEY (transactionType) REFERENCES transactionType(id)
 );
 
 CREATE TABLE IF NOT EXISTS transactionType (
