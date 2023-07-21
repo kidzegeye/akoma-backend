@@ -338,9 +338,11 @@ router.post(
   body("username").trim().notEmpty(),
   header("authorization").trim().notEmpty(),
   body("amount").isCurrency(
-    (require_symbol = false),
-    (decimal_separator = "."),
-    (require_decimal = true)
+    (options = {
+      require_symbol: false,
+      decimal_separator: ".",
+      require_decimal: true,
+    })
   ),
   async (req, res) => {
     const result = validationResult(req);
@@ -414,6 +416,13 @@ router.put(
   checkSchema(txnSchema),
   body("username").trim().notEmpty(),
   body("tid").trim().notEmpty(),
+  body("amount").isCurrency(
+    (options = {
+      require_symbol: false,
+      decimal_separator: ".",
+      require_decimal: true,
+    })
+  ),
   header("authorization").trim().notEmpty(),
   async (req, res) => {
     const result = validationResult(req);
